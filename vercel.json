@@ -1,0 +1,11 @@
+{
+  "buildCommand": "cd chandra-reg && npm install && npm run build",
+  "outputDirectory": "chandra-reg/dist",
+  "framework": "vite",
+  "rewrites": [
+    {
+      "source": "/(.*)",
+      "destination": "/index.html"
+    }
+  ]
+}

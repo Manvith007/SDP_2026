@@ -5,6 +5,7 @@ import react from "@vitejs/plugin-react";
 // directly. All API traffic uses relative /api/* URLs which Vite proxies to the
 // FastAPI service running alongside it.
 export default defineConfig({
+  base: "./",
   plugins: [react()],
   server: {
     host: "0.0.0.0",
