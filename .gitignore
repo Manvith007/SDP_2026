@@ -1,0 +1,25 @@
+# Dependencies
+node_modules/
+__pycache__/
+*.pyc
+
+# Environment
+.env
+.venv/
+env/
+venv/
+
+# Build & Cache
+dist/
+build/
+.cache/
+*.log
+
+# System & Admin
+.sudo_as_admin_successful
+
+# IDE & OS
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
