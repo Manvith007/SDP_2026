@@ -8,6 +8,7 @@ import {
 } from "./components/Panels";
 import {
   exportUrl, getPresets, health, imageUrl, runRegistration, uploadImage,
+  getApiBaseUrl, setApiBaseUrl, isDemoMode, setDemoMode,
 } from "./lib/api";
 
 const DEFAULTS = {
@@ -27,6 +28,8 @@ export default function App() {
   const [apiErr, setApiErr] = useState("");
   const [presets, setPresets] = useState([]);
   const [presetId, setPresetId] = useState(null);
+  const [showApiModal, setShowApiModal] = useState(false);
+  const [apiUrlInput, setApiUrlInput] = useState(getApiBaseUrl());
 
   const [src, setSrc] = useState(null);          // {id,name,w,h,gsd,sensor,uploaded}
   const [ref, setRef] = useState(null);
@@ -58,24 +61,28 @@ export default function App() {
   const firstRun = useRef(true);
 
   // ------------------------------------------------------------- boot
+  const initApp = useCallback(async (enableDemo = false) => {
+    if (enableDemo) setDemoMode(true);
+    try {
+      const h = await health();
+      setApi(h);
+      setApiErr("");
+    } catch (e) {
+      setApiErr(e.message || "Cannot reach the registration API.");
+    }
+    try {
+      const ps = await getPresets();
+      setPresets(ps);
+      if (ps.length) applyPreset(ps[0], true);
+    } catch (e) {
+      setApiErr(e.message);
+    }
+  }, [applyPreset]);
+
   useEffect(() => {
-    (async () => {
-      try {
-        setApi(await health());
-      } catch (e) {
-        setApiErr(e.message || "Cannot reach the registration API.");
-        return;
-      }
-      try {
-        const ps = await getPresets();
-        setPresets(ps);
-        if (ps.length) applyPreset(ps[0], true);
-      } catch (e) {
-        setApiErr(e.message);
-      }
-    })();
+    initApp();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [initApp]);
 
   const applyPreset = useCallback((p, initial = false) => {
     setPresetId(p.id);
@@ -182,26 +189,60 @@ export default function App() {
   const gsdRatio = src?.gsd && ref?.gsd ? src.gsd / ref.gsd : null;
 
   // ------------------------------------------------------------- API down
-  if (apiErr && !api) {
+  if (apiErr && !api && !isDemoMode()) {
     return (
-      <div style={{ display: "grid", placeItems: "center", height: "100vh", padding: 24 }}>
-        <div style={{ maxWidth: 460, textAlign: "center" }}>
-          <div style={{ fontSize: 34, marginBottom: 12 }}>🛰️</div>
-          <h2 style={{ margin: "0 0 8px", fontSize: 17 }}>Registration API unreachable</h2>
-          <p style={{ color: "var(--dim)", fontSize: 12.5, lineHeight: 1.7 }}>
-            {apiErr}
-            <br /><br />
-            Start the engine with{" "}
-            <code style={{
-              fontFamily: "var(--mono)", background: "var(--panel2)",
-              padding: "2px 6px", borderRadius: 5,
-            }}>python3 backend/server.py</code>
+      <div style={{ display: "grid", placeItems: "center", height: "100vh", padding: 24, background: "#06090f" }}>
+        <div style={{ maxWidth: 520, textAlign: "center", background: "#0c1322", padding: 32, borderRadius: 16, border: "1px solid var(--line)", boxShadow: "0 10px 40px #00000080" }}>
+          <div style={{ fontSize: 42, marginBottom: 12 }}>🌗</div>
+          <h2 style={{ margin: "0 0 8px", fontSize: 19, fontWeight: 700 }}>SELENE-REG Engine Connection</h2>
+          <p style={{ color: "var(--dim)", fontSize: 13, lineHeight: 1.6, marginBottom: 20 }}>
+            Hosted on static platform. Connect to your Python FastAPI backend or explore with built-in interactive demo mode.
           </p>
-          <button onClick={() => window.location.reload()} style={{
-            marginTop: 14, padding: "9px 20px", borderRadius: 9, border: "none",
-            background: "linear-gradient(135deg,#4da3ff,#8b5cf6)", color: "#fff",
-            fontWeight: 700, fontSize: 12,
-          }}>Retry</button>
+
+          <div style={{ display: "flex", flexDirection: "column", gap: 12, marginBottom: 24 }}>
+            <button
+              onClick={() => initApp(true)}
+              style={{
+                padding: "12px 20px", borderRadius: 10, border: "none",
+                background: "linear-gradient(135deg,#4da3ff,#8b5cf6)", color: "#fff",
+                fontWeight: 700, fontSize: 13, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", gap: 8,
+                boxShadow: "0 4px 15px #4da3ff40",
+              }}
+            >
+              <span>🚀 Launch Interactive Demo Mode</span>
+            </button>
+          </div>
+
+          <div style={{ borderTop: "1px solid var(--line)", paddingTop: 20, textAlign: "left" }}>
+            <div style={{ fontSize: 11.5, fontWeight: 600, color: "var(--txt)", marginBottom: 8 }}>
+              Connect Custom Backend API URL:
+            </div>
+            <div style={{ display: "flex", gap: 8 }}>
+              <input
+                type="text"
+                value={apiUrlInput}
+                onChange={(e) => setApiUrlInput(e.target.value)}
+                placeholder="http://localhost:8000/api"
+                style={{
+                  flex: 1, padding: "8px 12px", borderRadius: 8, border: "1px solid var(--line)",
+                  background: "#06090f", color: "#fff", fontFamily: "var(--mono)", fontSize: 12,
+                }}
+              />
+              <button
+                onClick={() => {
+                  setApiBaseUrl(apiUrlInput);
+                  setDemoMode(false);
+                  initApp(false);
+                }}
+                style={{
+                  padding: "8px 14px", borderRadius: 8, border: "1px solid var(--accent)",
+                  background: "#4da3ff20", color: "var(--accent)", fontWeight: 600, fontSize: 12, cursor: "pointer",
+                }}
+              >
+                Connect
+              </button>
+            </div>
+          </div>
         </div>
       </div>
     );
@@ -251,13 +292,21 @@ export default function App() {
           fontSize: 9.5, color: "var(--dim2)", fontFamily: "var(--mono)",
           textAlign: "right", lineHeight: 1.5,
         }}>
-          <div style={{ display: "flex", alignItems: "center", gap: 5, justifyContent: "flex-end" }}>
+          <button
+            onClick={() => setShowApiModal(true)}
+            style={{
+              display: "flex", alignItems: "center", gap: 5, justifyContent: "flex-end",
+              background: "transparent", border: "1px solid var(--line)", padding: "3px 8px",
+              borderRadius: 6, color: "var(--txt)", cursor: "pointer", fontSize: 10,
+            }}
+          >
             <span style={{
               width: 6, height: 6, borderRadius: "50%",
-              background: api ? "var(--ok)" : "var(--bad)",
+              background: api?.demo ? "#f59e0b" : api ? "var(--ok)" : "var(--bad)",
             }} />
-            {api ? api.engine : "offline"}
-          </div>
+            {api?.demo ? "Demo Mode" : api ? api.engine : "Offline"}
+            <span style={{ fontSize: 9, color: "var(--dim)" }}>⚙️</span>
+          </button>
           ISRO · SIH PS 26166
         </div>
       </header>
@@ -680,6 +729,48 @@ export default function App() {
           Smart India Hackathon · PS 26166 · ISRO / Dept. of Space
         </span>
       </footer>
+
+      {showApiModal && (
+        <div style={{ position: "fixed", inset: 0, background: "#000000aa", backdropFilter: "blur(6px)", display: "grid", placeItems: "center", zIndex: 100 }}>
+          <div style={{ background: "#0c1322", width: 440, padding: 24, borderRadius: 14, border: "1px solid var(--line)", boxShadow: "0 10px 40px #000" }}>
+            <h3 style={{ margin: "0 0 12px", fontSize: 16 }}>API Connection Settings</h3>
+            <p style={{ fontSize: 12, color: "var(--dim)", lineHeight: 1.5, marginBottom: 16 }}>
+              Configure your Python FastAPI backend server endpoint, or toggle Interactive Demo Mode.
+            </p>
+            <div style={{ marginBottom: 16 }}>
+              <label style={{ fontSize: 11, color: "var(--txt)", display: "block", marginBottom: 6 }}>API Base URL</label>
+              <input
+                type="text"
+                value={apiUrlInput}
+                onChange={(e) => setApiUrlInput(e.target.value)}
+                style={{ width: "100%", padding: "8px 12px", borderRadius: 8, border: "1px solid var(--line)", background: "#06090f", color: "#fff", fontSize: 12, fontFamily: "var(--mono)", boxSizing: "border-box" }}
+              />
+            </div>
+            <div style={{ display: "flex", gap: 8, justifyContent: "flex-end" }}>
+              <button
+                onClick={() => {
+                  setShowApiModal(false);
+                  initApp(true);
+                }}
+                style={{ padding: "8px 14px", borderRadius: 8, border: "1px solid var(--line)", background: "transparent", color: "var(--dim)", fontSize: 12, cursor: "pointer" }}
+              >
+                Use Demo Mode
+              </button>
+              <button
+                onClick={() => {
+                  setApiBaseUrl(apiUrlInput);
+                  setDemoMode(false);
+                  setShowApiModal(false);
+                  initApp(false);
+                }}
+                style={{ padding: "8px 14px", borderRadius: 8, border: "none", background: "var(--accent)", color: "#fff", fontWeight: 600, fontSize: 12, cursor: "pointer" }}
+              >
+                Connect Backend
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

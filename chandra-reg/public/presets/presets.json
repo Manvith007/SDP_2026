@@ -1,0 +1,113 @@
+[
+  {
+    "id": "ohrc_nac",
+    "sensor": "OHRC",
+    "refLabel": "LRO NAC",
+    "srcName": "ch2_ohr_ncp_20210531T0912_d18",
+    "refName": "LRO NAC M1096952439RE",
+    "site": "Boguslawsky E crater rim",
+    "coords": "72.9\u00b0S, 43.2\u00b0E",
+    "gsdSrc": 0.32,
+    "gsdRef": 0.52,
+    "bands": "Panchromatic 400\u2013800 nm",
+    "altitude": "99 km",
+    "swath": "3 km",
+    "sunSrc": {
+      "az": 100,
+      "el": 40
+    },
+    "sunRef": {
+      "az": 45,
+      "el": 58
+    },
+    "srcFile": "src_ohrc_nac.png",
+    "refFile": "ref_nac.png",
+    "defaults": {
+      "detector": "SIFT",
+      "model": "homography",
+      "ransac": "MAGSAC",
+      "ratio": 0.8,
+      "threshold": 3.0,
+      "prescale": 1.0,
+      "clahe": 3.0,
+      "invert": false,
+      "anms": true,
+      "ecc": false
+    },
+    "colormap": null
+  },
+  {
+    "id": "tmc_nac",
+    "sensor": "TMC-2",
+    "refLabel": "LRO NAC",
+    "srcName": "ch2_tmc_ndn_20200914T1122_d18",
+    "refName": "LRO NAC M1142582789LE",
+    "site": "Mare Smythii",
+    "coords": "2.1\u00b0N, 86.4\u00b0E",
+    "gsdSrc": 5.0,
+    "gsdRef": 0.52,
+    "bands": "Panchromatic 500\u2013850 nm",
+    "altitude": "100 km",
+    "swath": "20 km",
+    "sunSrc": {
+      "az": 100,
+      "el": 40
+    },
+    "sunRef": {
+      "az": 45,
+      "el": 58
+    },
+    "srcFile": "src_tmc_nac.png",
+    "refFile": "ref_nac.png",
+    "defaults": {
+      "detector": "SIFT",
+      "model": "homography",
+      "ransac": "MAGSAC",
+      "ratio": 0.84,
+      "threshold": 3.0,
+      "prescale": 2.2,
+      "clahe": 3.0,
+      "invert": false,
+      "anms": true,
+      "ecc": false
+    },
+    "colormap": null
+  },
+  {
+    "id": "iirs_tc",
+    "sensor": "IIRS",
+    "refLabel": "SELENE TC",
+    "srcName": "ch2_iir_nci_20211102T0655_d18",
+    "refName": "SELENE TC Morning Map",
+    "site": "Sinus Iridum",
+    "coords": "44.1\u00b0N, 31.5\u00b0W",
+    "gsdSrc": 80.0,
+    "gsdRef": 7.4,
+    "bands": "SWIR 0.8\u20135.0 \u00b5m (256 bands)",
+    "altitude": "100 km",
+    "swath": "20 km",
+    "sunSrc": {
+      "az": 100,
+      "el": 40
+    },
+    "sunRef": {
+      "az": 45,
+      "el": 58
+    },
+    "srcFile": "src_iirs_tc.png",
+    "refFile": "ref_tc.png",
+    "defaults": {
+      "detector": "SIFT",
+      "model": "affine",
+      "ransac": "MAGSAC",
+      "ratio": 0.86,
+      "threshold": 3.0,
+      "prescale": 1.4,
+      "clahe": 3.0,
+      "invert": false,
+      "anms": true,
+      "ecc": false
+    },
+    "colormap": "inferno"
+  }
+]
