@@ -6,6 +6,15 @@ Smart India Hackathon · Problem Statement **26166** · ISRO / Dept. of Space
 
 ---
 
+## 🌐 Live Deployments
+
+- 🚀 **Vercel**: [https://sdp-2026.vercel.app/](https://sdp-2026.vercel.app/)
+- ⚡ **Netlify**: [https://fluffy-swan-65a7d8.netlify.app/](https://fluffy-swan-65a7d8.netlify.app/)
+- 🐙 **GitHub Pages**: [https://manvith007.github.io/SDP_2026/](https://manvith007.github.io/SDP_2026/)
+- 📁 **GitHub Repository**: [https://github.com/Manvith007/SDP_2026](https://github.com/Manvith007/SDP_2026)
+
+---
+
 ## Overview
 
 A working image-registration system, not a mockup. A FastAPI + OpenCV backend performs live feature detection, descriptor matching, and robust model fitting; a React front end drives it and visualises every intermediate result.
