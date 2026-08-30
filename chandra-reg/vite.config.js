@@ -13,7 +13,6 @@ export default defineConfig({
     strictPort: true,
     allowedHosts: true,
     cors: true,
-    hmr: { clientPort: 443, protocol: "wss" },
     proxy: {
       "/api": {
         target: "http://127.0.0.1:8000",
