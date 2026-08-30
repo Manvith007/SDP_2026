@@ -60,6 +60,18 @@ export default function App() {
   const stageTimer = useRef(null);
   const firstRun = useRef(true);
 
+  const applyPreset = useCallback((p, initial = false) => {
+    setPresetId(p.id);
+    setSrc({ id: p.srcId, name: p.srcName, w: p.srcSize[0], h: p.srcSize[1],
+             gsd: p.gsdSrc, sensor: p.sensor, meta: p });
+    setRef({ id: p.refId, name: p.refName, w: p.refSize[0], h: p.refSize[1],
+             gsd: p.gsdRef, sensor: p.refLabel });
+    setParams({ ...DEFAULTS, ...p.defaults });
+    setResult(null);
+    setRunErr("");
+    if (!initial) firstRun.current = true;
+  }, []);
+
   // ------------------------------------------------------------- boot
   const initApp = useCallback(async (enableDemo = false) => {
     if (enableDemo) setDemoMode(true);
@@ -83,18 +95,6 @@ export default function App() {
     initApp();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [initApp]);
-
-  const applyPreset = useCallback((p, initial = false) => {
-    setPresetId(p.id);
-    setSrc({ id: p.srcId, name: p.srcName, w: p.srcSize[0], h: p.srcSize[1],
-             gsd: p.gsdSrc, sensor: p.sensor, meta: p });
-    setRef({ id: p.refId, name: p.refName, w: p.refSize[0], h: p.refSize[1],
-             gsd: p.gsdRef, sensor: p.refLabel });
-    setParams({ ...DEFAULTS, ...p.defaults });
-    setResult(null);
-    setRunErr("");
-    if (!initial) firstRun.current = true;
-  }, []);
 
   // load preview bitmaps
   useEffect(() => {
