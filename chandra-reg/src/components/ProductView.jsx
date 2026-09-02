@@ -15,13 +15,20 @@ export default function ProductView({ products, mode, setMode, busy }) {
   useEffect(() => {
     const up = () => setDragging(false);
     window.addEventListener("mouseup", up);
-    return () => window.removeEventListener("mouseup", up);
+    window.addEventListener("touchend", up);
+    return () => {
+      window.removeEventListener("mouseup", up);
+      window.removeEventListener("touchend", up);
+    };
   }, []);
 
   const setFromEvent = (e) => {
     if (!boxRef.current) return;
     const r = boxRef.current.getBoundingClientRect();
-    setSwipe(Math.max(0, Math.min(100, ((e.clientX - r.left) / r.width) * 100)));
+    const clientX = e.touches && e.touches.length > 0 ? e.touches[0].clientX : e.clientX;
+    if (clientX !== undefined) {
+      setSwipe(Math.max(0, Math.min(100, ((clientX - r.left) / r.width) * 100)));
+    }
   };
 
   const MODES = [["swipe", "Swipe"], ["blend", "Blend"],
@@ -62,10 +69,13 @@ export default function ProductView({ products, mode, setMode, busy }) {
         ref={boxRef}
         onMouseMove={(e) => dragging && setFromEvent(e)}
         onMouseDown={(e) => { if (mode === "swipe") { setDragging(true); setFromEvent(e); } }}
+        onTouchMove={(e) => dragging && setFromEvent(e)}
+        onTouchStart={(e) => { if (mode === "swipe") { setDragging(true); setFromEvent(e); } }}
         style={{
           position: "relative", flex: 1, minHeight: 220, borderRadius: 11,
           overflow: "hidden", background: "#03050a", border: "1px solid var(--line)",
           cursor: mode === "swipe" ? "ew-resize" : "default",
+          touchAction: mode === "swipe" ? "none" : "auto",
           opacity: busy ? .45 : 1, transition: "opacity .2s",
         }}
       >

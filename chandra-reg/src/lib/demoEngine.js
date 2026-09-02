@@ -198,23 +198,43 @@ export function generateDemoRegistration({ srcId, refId, params }) {
   const totalErr = inliers.reduce((sum, m) => sum + m.err * m.err, 0);
   const rmseVal = inliers.length ? Math.sqrt(totalErr / inliers.length) : 0;
 
+  const grid = new Array(64).fill(0);
+  for (const m of inliers) {
+    const gx = Math.min(7, Math.max(0, Math.floor((m.rx / rw) * 8)));
+    const gy = Math.min(7, Math.max(0, Math.floor((m.ry / rh) * 8)));
+    grid[gy * 8 + gx] += 1;
+  }
+  const occupied = grid.filter((v) => v > 0).length;
+
+  const hist_bins = new Array(10).fill(0);
+  for (const m of inliers) {
+    const idx = Math.min(9, Math.floor((m.err / 4.0) * 10));
+    if (idx >= 0) hist_bins[idx] += 1;
+  }
+
   return {
     ok: true,
     job: `demo_${Date.now().toString(16)}`,
     warnings: [
       "Running in Offline / Static Demo Mode. Metrics & correspondences recomputed locally.",
     ],
+    params: params || p.defaults,
+    grid,
+    hist_bins,
     metrics: {
       rmse: Math.round(rmseVal * 1000) / 1000,
       inlierRatio: Math.round(inlierRatio * 1000) / 1000,
-      uniformity: 0.652,
-      occupancy: 0.48,
+      uniformity: Math.round(((occupied / 64) * 0.5 + 0.4) * 1000) / 1000,
+      occupancy: occupied / 64,
+      median: 0.292,
+      p90: 0.754,
     },
     counts: {
       kpSrcRaw: 12450,
       kpSrc: 6000,
       kpRefRaw: 14200,
       kpRef: 6000,
+      knn: 8500,
       candidates: candidates.length,
       inliers: inliers.length,
     },
@@ -235,6 +255,7 @@ export function generateDemoRegistration({ srcId, refId, params }) {
       registered: p.srcFile,
       checker: p.refFile,
       diff: p.srcFile,
+      reference: p.refFile,
     },
     totalMs: 740,
     H,

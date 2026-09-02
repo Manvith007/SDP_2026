@@ -118,14 +118,17 @@ select:focus { border-color: var(--accent); }
   }
   .viewer { height: 60vh; min-height: 370px; }
   .report-grid { grid-template-columns: 1fr; gap: 15px; }
-  .topbar { flex-wrap: wrap; gap: 9px; }
-  .hdr-meta { display: none; }
+  .topbar { flex-wrap: wrap; gap: 9px; padding: 10px 12px; }
+  .hdr-meta { display: block; }
   .tabs { order: 3; width: 100%; }
-  .tabs button { flex: 1; }
+  .tabs button { flex: 1; min-height: 36px; }
 }
 @media (max-width: 560px) {
-  .metrics { grid-template-columns: repeat(2, 1fr); }
-  .viewer { height: 52vh; min-height: 310px; }
+  .metrics { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 6px; }
+  .viewer { height: 50vh; min-height: 290px; }
+  .topbar { padding: 8px 10px; }
+  input[type="range"]::-webkit-slider-thumb { width: 22px; height: 22px; }
+  input[type="range"]::-moz-range-thumb { width: 22px; height: 22px; }
 }
 
 /* ---------------------------------------------- PS compliance matrix */

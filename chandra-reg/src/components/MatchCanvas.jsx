@@ -373,6 +373,51 @@ export default function MatchCanvas({
     setHover(best);
   };
 
+  const touchState = useRef(null);
+
+  const onTouchStart = (e) => {
+    if (!cvRef.current) return;
+    const r = cvRef.current.getBoundingClientRect();
+    if (e.touches.length === 1) {
+      const t = e.touches[0];
+      const mx = t.clientX - r.left, my = t.clientY - r.top;
+      touchState.current = { type: "pan", mx, my, vx: view.x, vy: view.y };
+      onMove({ clientX: t.clientX, clientY: t.clientY });
+    } else if (e.touches.length === 2) {
+      const t1 = e.touches[0], t2 = e.touches[1];
+      const dist = Math.hypot(t1.clientX - t2.clientX, t1.clientY - t2.clientY);
+      const midX = (t1.clientX + t2.clientX) / 2 - r.left;
+      const midY = (t1.clientY + t2.clientY) / 2 - r.top;
+      touchState.current = { type: "pinch", dist, vk: view.k, midX, midY, vx: view.x, vy: view.y };
+    }
+  };
+
+  const onTouchMove = (e) => {
+    if (!cvRef.current || !touchState.current) return;
+    const r = cvRef.current.getBoundingClientRect();
+    if (e.touches.length === 1 && touchState.current.type === "pan") {
+      const t = e.touches[0];
+      const mx = t.clientX - r.left, my = t.clientY - r.top;
+      const ts = touchState.current;
+      setView((v) => ({ ...v, x: ts.vx + (mx - ts.mx), y: ts.vy + (my - ts.my) }));
+      onMove({ clientX: t.clientX, clientY: t.clientY });
+    } else if (e.touches.length === 2 && touchState.current.type === "pinch") {
+      const t1 = e.touches[0], t2 = e.touches[1];
+      const dist = Math.hypot(t1.clientX - t2.clientX, t1.clientY - t2.clientY);
+      const ts = touchState.current;
+      if (ts.dist > 0) {
+        const factor = dist / ts.dist;
+        const nk = Math.max(0.5, Math.min(18, ts.vk * factor));
+        setView((v) => ({ ...v, k: nk }));
+      }
+    }
+  };
+
+  const onTouchEnd = () => {
+    touchState.current = null;
+    setHover(null);
+  };
+
   return (
     <div ref={wrapRef} style={{ position: "relative", width: "100%", height: "100%" }}>
       <canvas ref={cvRef} onWheel={onWheel} onMouseMove={onMove}
@@ -382,7 +427,10 @@ export default function MatchCanvas({
         }}
         onMouseUp={() => setDrag(null)}
         onMouseLeave={() => { setDrag(null); setHover(null); setMouse(null); }}
-        style={{ display: "block", cursor: drag ? "grabbing" : hover ? "pointer" : "grab" }} />
+        onTouchStart={onTouchStart}
+        onTouchMove={onTouchMove}
+        onTouchEnd={onTouchEnd}
+        style={{ display: "block", cursor: drag ? "grabbing" : hover ? "pointer" : "grab", touchAction: "none" }} />
 
       {busy && (
         <div style={{
