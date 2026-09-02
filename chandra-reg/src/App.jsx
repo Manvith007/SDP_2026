@@ -514,12 +514,12 @@ export default function App() {
                       <H>Detector / matcher</H>
                       <Row k="Detector" v={result.params.detector} />
                       <Row k="Keypoints (src)"
-                           v={`${C.kpSrc.toLocaleString()}${C.kpSrcRaw !== C.kpSrc ? ` of ${C.kpSrcRaw.toLocaleString()}` : ""}`} />
+                           v={`${(C?.kpSrc ?? 0).toLocaleString()}${C?.kpSrcRaw !== C?.kpSrc ? ` of ${(C?.kpSrcRaw ?? 0).toLocaleString()}` : ""}`} />
                       <Row k="Keypoints (ref)"
-                           v={`${C.kpRef.toLocaleString()}${C.kpRefRaw !== C.kpRef ? ` of ${C.kpRefRaw.toLocaleString()}` : ""}`} />
-                      <Row k="k-NN pairs" v={C.knn.toLocaleString()} />
-                      <Row k="After ratio test" v={C.candidates.toLocaleString()} />
-                      <Row k="RANSAC inliers" v={C.inliers.toLocaleString()} tone="ok" />
+                           v={`${(C?.kpRef ?? 0).toLocaleString()}${C?.kpRefRaw !== C?.kpRef ? ` of ${(C?.kpRefRaw ?? 0).toLocaleString()}` : ""}`} />
+                      <Row k="k-NN pairs" v={(C?.knn ?? 0).toLocaleString()} />
+                      <Row k="After ratio test" v={(C?.candidates ?? 0).toLocaleString()} />
+                      <Row k="RANSAC inliers" v={(C?.inliers ?? 0).toLocaleString()} tone="ok" />
                       <Row k="Robust method" v={result.params.ransac} />
                       <div style={{ height: 12 }} />
                       <H>Accuracy</H>

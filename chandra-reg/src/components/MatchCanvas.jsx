@@ -46,7 +46,8 @@ export default function MatchCanvas({
   const TOP_PAD = 40;  // reserved strip for the floating layout toggle + captions
 
   const geom = useCallback(() => {
-    const [sw, sh] = srcSize, [rw, rh] = refSize;
+    const [sw, sh] = srcSize && Array.isArray(srcSize) ? srcSize : [1000, 1000];
+    const [rw, rh] = refSize && Array.isArray(refSize) ? refSize : [1000, 1000];
     if (layout === "overlay") {
       const availO = size.h - TOP_PAD;
       const base = Math.min(size.w / rw, availO / rh) * 0.94;
